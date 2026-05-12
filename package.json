@@ -1,0 +1,79 @@
+{
+  "name": "api18n",
+  "version": "0.1.0",
+  "description": "React + Next.js i18n runtime SDK for the api18n translation manager. One init file, typed keys, ICU plurals, rich tag interpolation.",
+  "license": "MIT",
+  "author": "api18n",
+  "homepage": "https://github.com/api18n-app/api18n-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/api18n-app/api18n-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/api18n-app/api18n-sdk/issues"
+  },
+  "keywords": [
+    "api18n",
+    "i18n",
+    "internationalization",
+    "translations",
+    "localization",
+    "react",
+    "next",
+    "icu"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server/index.js"
+    },
+    "./next": {
+      "types": "./dist/next/index.d.ts",
+      "import": "./dist/next/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "bun run typecheck && bun run test && bun run build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "dependencies": {
+    "intl-messageformat": "^10.7.7"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "happy-dom": "^15.11.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
