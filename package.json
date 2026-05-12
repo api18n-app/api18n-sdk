@@ -50,7 +50,7 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.types-test.json",
     "test": "vitest run",
     "test:watch": "vitest",
     "prepublishOnly": "bun run typecheck && bun run test && bun run build"

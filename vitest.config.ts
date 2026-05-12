@@ -7,5 +7,6 @@ export default defineConfig({
     environment: 'happy-dom',
     globals: false,
     include: ['test/**/*.test.{ts,tsx}'],
+    exclude: ['**/node_modules/**', 'test/**/*.test-d.{ts,tsx}'],
   },
 });
