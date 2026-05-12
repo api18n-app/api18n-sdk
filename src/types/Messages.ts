@@ -4,7 +4,7 @@
  * Users opt in by importing the auto-generated `messages.d.ts` from `api18n pull`,
  * which declares:
  *
- *   declare module 'api18n' {
+ *   declare module '@api18n/react' {
  *     interface Messages {
  *       'hello': { __raw: 'Hello {name}'; name: string };
  *     }

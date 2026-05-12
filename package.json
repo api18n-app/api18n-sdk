@@ -1,5 +1,5 @@
 {
-  "name": "api18n",
+  "name": "@api18n/react",
   "version": "0.1.0",
   "description": "React + Next.js i18n runtime SDK for the api18n translation manager. One init file, typed keys, ICU plurals, rich tag interpolation.",
   "license": "MIT",

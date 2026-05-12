@@ -1,4 +1,4 @@
-# api18n
+# @api18n/react
 
 React + Next.js i18n runtime SDK for the [api18n](https://www.api18n.com)
 translation manager. One init file, typed keys, ICU plurals, rich tag
@@ -7,9 +7,9 @@ interpolation.
 ## Install
 
 ```bash
-npm install api18n
+npm install @api18n/react
 # or
-bun add api18n
+bun add @api18n/react
 ```
 
 Pair it with `@api18n/cli` for pulling translations from the dashboard:
@@ -22,7 +22,7 @@ npm install --save-dev @api18n/cli
 
 ```ts
 // src/api18n.ts
-import { createApi18n } from 'api18n';
+import { createApi18n } from '@api18n/react';
 import en from './messages/en.json';
 import ptBR from './messages/pt-BR.json';
 
@@ -40,7 +40,7 @@ import { App } from './App';
 ```
 
 ```tsx
-import { useTranslations } from 'api18n';
+import { useTranslations } from '@api18n/react';
 
 export function Home() {
   const t = useTranslations();
@@ -79,7 +79,7 @@ t('agreement', {
 ## Locale switching
 
 ```tsx
-import { useLocale, setLocale } from 'api18n';
+import { useLocale, setLocale } from '@api18n/react';
 
 function LocalePicker() {
   const locale = useLocale();
@@ -102,7 +102,7 @@ HTML.
 
 ```tsx
 // app/[locale]/layout.tsx
-import { setRequestLocale } from 'api18n/server';
+import { setRequestLocale } from '@api18n/react/server';
 import '../api18n';
 
 export default async function Layout({ children, params }) {
@@ -114,7 +114,7 @@ export default async function Layout({ children, params }) {
 
 ```tsx
 // any Server Component
-import { getTranslations } from 'api18n/server';
+import { getTranslations } from '@api18n/react/server';
 
 export default async function Page() {
   const t = await getTranslations();
