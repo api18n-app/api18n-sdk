@@ -6,4 +6,11 @@ export { useLocale, setLocale, getLocale } from './client/useLocale.js';
 export { useFormatter } from './client/useFormatter.js';
 export type { Formatter } from './client/useFormatter.js';
 export type { Resources, NestedMessages } from './client/store.js';
-export type { Messages, TranslationKey, ArgsFor } from './types/Messages.js';
+export type { TranslationValue } from './types/TranslationValue.js';
+export type {
+  ArgsFor,
+  Messages,
+  RawValueFor,
+  TextTranslationKey,
+  TranslationKey,
+} from './types/Messages.js';

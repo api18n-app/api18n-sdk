@@ -104,4 +104,67 @@ describe('useTranslations', () => {
     render(<Btn />);
     expect(screen.getByRole('button').textContent).toBe('Confirm order');
   });
+
+  it('returns structured values unchanged through t.raw', () => {
+    const steps = [
+      'Create an account',
+      { title: 'Invite teammates', optional: false },
+    ];
+    createApi18n({
+      resources: {
+        en: { checkout: { enabled: true, maximumItems: 8, steps } },
+      },
+      defaultLocale: 'en',
+    });
+    function RawValues() {
+      const t = useTranslations();
+      return (
+        <output>
+          {JSON.stringify({
+            enabled: t.raw('checkout.enabled'),
+            maximumItems: t.raw('checkout.maximumItems'),
+            steps: t.raw('checkout.steps'),
+          })}
+        </output>
+      );
+    }
+
+    render(<RawValues />);
+
+    expect(screen.getByText(JSON.stringify({ enabled: true, maximumItems: 8, steps }))).toBeTruthy();
+  });
+
+  it('applies namespace and locale fallback to t.raw', () => {
+    createApi18n({
+      resources: {
+        en: { checkout: { steps: ['Fallback'] } },
+        pt: { checkout: {} },
+      },
+      defaultLocale: 'pt',
+      fallbackLocale: 'en',
+    });
+    function RawValue() {
+      const t = useTranslations('checkout');
+      return <output>{JSON.stringify(t.raw('steps'))}</output>;
+    }
+
+    render(<RawValue />);
+
+    expect(screen.getByText('["Fallback"]')).toBeTruthy();
+  });
+
+  it('does not stringify structured values through the text API at runtime', () => {
+    createApi18n({
+      resources: { en: { checkout: { steps: ['First', 'Second'] } } },
+      defaultLocale: 'en',
+    });
+    function TextValue() {
+      const t = useTranslations();
+      return <output>{t('checkout.steps')}</output>;
+    }
+
+    render(<TextValue />);
+
+    expect(screen.getByText('checkout.steps')).toBeTruthy();
+  });
 });
