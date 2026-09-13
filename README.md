@@ -76,6 +76,47 @@ t('agreement', {
 });
 ```
 
+## Structured values
+
+Locale files can also contain finite numbers, booleans, and arrays. Arrays are
+atomic translation values and can contain nested JSON values and objects:
+
+```json
+{
+  "checkout": {
+    "enabled": true,
+    "maximumItems": 8,
+    "benefits": [
+      "Free returns",
+      { "label": "Priority support", "featured": true }
+    ]
+  }
+}
+```
+
+Read these values with `t.raw`. It uses the same locale, fallback, and namespace
+resolution as `t`, but returns the value without ICU interpolation:
+
+```tsx
+const t = useTranslations('checkout');
+
+const enabled = t.raw('enabled');          // boolean
+const maximumItems = t.raw('maximumItems'); // number
+const benefits = t.raw('benefits');        // typed tuple/object shape
+```
+
+`t.raw` is also available from the server API:
+
+```tsx
+const t = await getTranslations('checkout');
+const benefits = t.raw('benefits');
+```
+
+The callable `t('key', args)` API is string-only. With generated types,
+TypeScript directs structured keys to `t.raw`; without generated types, calling
+`t` with a structured key safely returns the key rather than coercing the array
+to text.
+
 ## Locale switching
 
 ```tsx
@@ -134,6 +175,7 @@ is included in your `tsconfig.json`:
 t('button.cancl');                    // ❌ TS error: key doesn't exist
 t('welcome');                         // ❌ TS error: missing arg `name`
 t('welcome', { name: 'Eduardo' });    // ✅
+t.raw('checkout.benefits');            // ✅ inferred structured shape
 ```
 
 ## License

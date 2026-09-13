@@ -16,6 +16,32 @@ describe('createStore', () => {
     expect(flat.get('hello')).toBe('Hi');
   });
 
+  it('preserves numbers, booleans, and arrays as atomic values', () => {
+    const steps = [
+      'Create an account',
+      { title: 'Invite teammates', optional: false, rank: 2 },
+    ];
+    const store = createStore({
+      locale: 'en',
+      resources: {
+        en: {
+          checkout: {
+            enabled: true,
+            maximumItems: 8,
+            steps,
+          },
+        },
+      },
+      fallbackLocale: 'en',
+    });
+    const flat = store.getFlat('en');
+
+    expect(flat.get('checkout.enabled')).toBe(true);
+    expect(flat.get('checkout.maximumItems')).toBe(8);
+    expect(flat.get('checkout.steps')).toBe(steps);
+    expect(flat.has('checkout.steps.0')).toBe(false);
+  });
+
   it('caches the flattened map per locale', () => {
     const store = createStore({
       locale: 'en',

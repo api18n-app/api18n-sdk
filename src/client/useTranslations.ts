@@ -1,16 +1,29 @@
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { interpolate, type Args } from '../parser/index.js';
-import type { Messages, TranslationKey, ArgsFor } from '../types/Messages.js';
+import type {
+  ArgsFor,
+  Messages,
+  RawValueFor,
+  TextTranslationKey,
+  TranslationKey,
+} from '../types/Messages.js';
+import type { TranslationValue } from '../types/TranslationValue.js';
 import { getStore } from './registry.js';
 
 type HasArgs<A> = [keyof A] extends [never] ? false : true;
 
-type StrictTFunction = <K extends TranslationKey>(
-  key: K,
-  ...args: HasArgs<ArgsFor<K>> extends true ? [ArgsFor<K>] : []
-) => RenderResult<K>;
+type StrictTFunction = {
+  <K extends TextTranslationKey>(
+    key: K,
+    ...args: HasArgs<ArgsFor<K>> extends true ? [ArgsFor<K>] : []
+  ): RenderResult<K>;
+  raw<K extends TranslationKey>(key: K): RawValueFor<K>;
+};
 
-type PermissiveTFunction = (key: string, args?: Args) => string | ReactNode[];
+type PermissiveTFunction = {
+  (key: string, args?: Args): string | ReactNode[];
+  raw(key: string): TranslationValue;
+};
 
 export type TFunction = [keyof Messages] extends [never] ? PermissiveTFunction : StrictTFunction;
 
@@ -32,11 +45,20 @@ export function useTranslations(namespace?: string): TFunction {
     const flat = store.getFlat(locale);
     const fallback = store.getState().fallbackLocale;
     const fallbackFlat = fallback && fallback !== locale ? store.getFlat(fallback) : null;
-    const t = ((key: string, args?: Args) => {
+    const resolve = (key: string): TranslationValue => {
       const fullKey = namespace ? `${namespace}.${key}` : key;
-      const message = flat.get(fullKey) ?? fallbackFlat?.get(fullKey) ?? fullKey;
+      if (flat.has(fullKey)) return flat.get(fullKey)!;
+      if (fallbackFlat?.has(fullKey)) return fallbackFlat.get(fullKey)!;
+      return fullKey;
+    };
+    const t = ((key: string, args?: Args) => {
+      const message = resolve(key);
+      if (typeof message !== 'string') {
+        return namespace ? `${namespace}.${key}` : key;
+      }
       return interpolate(message, args ?? {}, locale);
     }) as TFunction;
+    t.raw = ((key: string) => resolve(key)) as TFunction['raw'];
     return t;
   }, [locale, namespace, store]);
 }

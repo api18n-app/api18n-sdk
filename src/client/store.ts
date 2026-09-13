@@ -1,4 +1,11 @@
-export type NestedMessages = { [key: string]: string | NestedMessages };
+import {
+  isTranslationValue,
+  type TranslationValue,
+} from '../types/TranslationValue.js';
+
+export type NestedMessages = {
+  [key: string]: TranslationValue | NestedMessages;
+};
 export type Resources = Record<string, NestedMessages>;
 
 export interface StoreState {
@@ -13,23 +20,23 @@ export interface Api18nStore {
   getState(): StoreState;
   setLocale(locale: string): void;
   subscribe(listener: Listener): () => void;
-  getFlat(locale: string): Map<string, string>;
+  getFlat(locale: string): Map<string, TranslationValue>;
 }
 
 export function createStore(initial: StoreState): Api18nStore {
   let state = initial;
   const listeners = new Set<Listener>();
-  const flatCache = new Map<string, Map<string, string>>();
+  const flatCache = new Map<string, Map<string, TranslationValue>>();
 
   function emit() {
     for (const l of listeners) l();
   }
 
-  function ensureFlat(locale: string): Map<string, string> {
+  function ensureFlat(locale: string): Map<string, TranslationValue> {
     const cached = flatCache.get(locale);
     if (cached) return cached;
     const msgs = state.resources[locale];
-    const flat = new Map<string, string>();
+    const flat = new Map<string, TranslationValue>();
     if (msgs) flatten(msgs, '', flat);
     flatCache.set(locale, flat);
     return flat;
@@ -50,13 +57,17 @@ export function createStore(initial: StoreState): Api18nStore {
   };
 }
 
-function flatten(obj: NestedMessages, prefix: string, out: Map<string, string>): void {
+function flatten(
+  obj: NestedMessages,
+  prefix: string,
+  out: Map<string, TranslationValue>,
+): void {
   for (const key of Object.keys(obj)) {
     const value = obj[key];
     const path = prefix ? `${prefix}.${key}` : key;
-    if (typeof value === 'string') {
+    if (isTranslationValue(value)) {
       out.set(path, value);
-    } else if (value && typeof value === 'object') {
+    } else if (value && typeof value === 'object' && !Array.isArray(value)) {
       flatten(value, path, out);
     }
   }

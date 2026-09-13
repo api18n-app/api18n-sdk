@@ -19,9 +19,29 @@ export interface Messages {
 
 export type TranslationKey = keyof Messages extends never ? string : keyof Messages & string;
 
+type KnownTextTranslationKey = {
+  [K in keyof Messages & string]: Messages[K] extends { __raw: string }
+    ? K
+    : never;
+}[keyof Messages & string];
+
+/** Keys whose generated base-locale value is a string message. */
+export type TextTranslationKey = keyof Messages extends never
+  ? string
+  : KnownTextTranslationKey;
+
 /**
  * Strip `__raw` (the message string used for codegen) and return only the runtime args.
  */
 export type ArgsFor<K> = K extends keyof Messages
   ? Omit<Messages[K], '__raw'>
   : Record<string, unknown>;
+
+/** The non-interpolated value returned by `t.raw(key)`. */
+export type RawValueFor<K> = K extends keyof Messages
+  ? Messages[K] extends { __raw: infer Raw }
+    ? Raw extends string
+      ? string
+      : Raw
+    : never
+  : import('./TranslationValue.js').TranslationValue;

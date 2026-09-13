@@ -6,6 +6,12 @@
  */
 import type { ReactNode } from 'react';
 import { useTranslations } from '../src/client/useTranslations.js';
+import { getTranslations } from '../src/server/index.js';
+import type {
+  RawValueFor,
+  TextTranslationKey,
+  TranslationKey,
+} from '../src/types/Messages.js';
 
 declare module '../src/types/Messages.js' {
   interface Messages {
@@ -19,6 +25,11 @@ declare module '../src/types/Messages.js' {
       __raw: 'By signing up <link>terms</link>';
       link: (chunks: ReactNode) => ReactNode;
     };
+    enabled: { __raw: boolean };
+    maximumItems: { __raw: number };
+    steps: {
+      __raw: [string, { title: string; optional: boolean; tags: [string, null] }];
+    };
   }
 }
 
@@ -28,7 +39,27 @@ function passes() {
   const b: string = t('cart.items', { count: 3 });
   const c: string = t('button.cancel');
   const d: ReactNode = t('agreement', { link: (chunks) => chunks });
-  return [a, b, c, d];
+  const enabled: boolean = t.raw('enabled');
+  const maximumItems: number = t.raw('maximumItems');
+  const steps: [string, { title: string; optional: boolean; tags: [string, null] }] =
+    t.raw('steps');
+  const rawText: string = t.raw('hello');
+  const anyKey: TranslationKey = 'steps';
+  const textKey: TextTranslationKey = 'hello';
+  const rawType: RawValueFor<'maximumItems'> = 3;
+  return [
+    a,
+    b,
+    c,
+    d,
+    enabled,
+    maximumItems,
+    steps,
+    rawText,
+    anyKey,
+    textKey,
+    rawType,
+  ];
 }
 
 function fails() {
@@ -43,4 +74,27 @@ function fails() {
   t('cart.items', { count: '3' });
   // @ts-expect-error — keyless call accepts no args, none expected
   t('button.cancel', { foo: 1 });
+  // @ts-expect-error — structured values must use t.raw()
+  t('enabled');
+  // @ts-expect-error — structured values must use t.raw()
+  t('steps');
+  // @ts-expect-error — unknown raw key
+  t.raw('stepz');
+}
+
+async function serverPasses() {
+  const t = await getTranslations();
+  const greeting: string = t('hello', { name: 'Eduardo' });
+  const enabled: boolean = t.raw('enabled');
+  const steps: [string, { title: string; optional: boolean; tags: [string, null] }] =
+    t.raw('steps');
+  return [greeting, enabled, steps];
+}
+
+async function serverFails() {
+  const t = await getTranslations();
+  // @ts-expect-error — structured values must use t.raw() on the server too
+  t('maximumItems');
+  // @ts-expect-error — unknown raw key
+  t.raw('maximumItemz');
 }
